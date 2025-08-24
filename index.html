@@ -69,21 +69,49 @@
 <script>
 
   let name;
-  /* ---------- Extrae el último segmento de la URL y lo formatea ---------- */
-  
-  (function () {
-    // toma pathname (por ejemplo "/ruta/al/usuario"), ignora barras vacías
-    const lastRaw = window.location.pathname.split('/').filter(Boolean).pop() || '';
-    // si no hay nada, usamos 'Jugador'
-    const raw = lastRaw || 'Jugador';
-    // decodifica y limpia: reemplaza guiones/underscores/plus por espacios
-    const decoded = decodeURIComponent(raw.replace(/\+/g, ' ')).replace(/[-_]+/g, ' ').trim();
-    // capitaliza cada palabra
-    name = decoded.split(/\s+/).map(s => s.charAt(0).toUpperCase() + s.slice(1).toLowerCase()).join(' ');
-    // setea en el span
-    const el = document.getElementById('username');
-    if (el) el.textContent = name || 'Jugador';
-  })();
+
+/* ---------- Extrae token (preferencia: query) y lo formatea ---------- */
+(function () {
+  // intenta primero sacar lo que viene después del "?"
+  const search = window.location.search || '';
+  let rawResult = '';
+
+  if (search.length > 1) {
+    // quitamos el "?" y cualquier hash
+    const raw = search.slice(1).split('#')[0];
+
+    if (raw.includes('=')) {
+      // caso standard key=value: tomamos el primer parámetro disponible
+      const params = new URLSearchParams(raw);
+      const firstKey = Array.from(params.keys())[0];
+      const firstValue = params.get(firstKey);
+      rawResult = (firstValue !== null && firstValue !== '') ? firstValue : firstKey;
+    } else {
+      // caso token suelto: ?Rmati1aho
+      rawResult = raw.split('&')[0];
+    }
+  } else {
+    // si no hay query, usamos el último segmento del pathname
+    rawResult = window.location.pathname.split('/').filter(Boolean).pop() || '';
+  }
+
+  // fallback si quedó vacío
+  if (!rawResult) rawResult = 'Jugador';
+
+  // decodificar y limpiar: + -> espacio, reemplazar -/_ por espacios, trim
+  const decoded = decodeURIComponent(rawResult.replace(/\+/g, ' ')).replace(/[-_]+/g, ' ').trim();
+
+  // capitalizar cada palabra y asignar a la variable `name` (ya declarada arriba)
+  name = decoded
+    .split(/\s+/)
+    .map(s => s.charAt(0).toUpperCase() + s.slice(1).toLowerCase())
+    .join(' ');
+
+  // setea en el span si existe
+  const el = document.getElementById('username');
+  if (el) el.textContent = name || 'Jugador';
+})();
+
 
 
   async function  postBack(url, payload) {
