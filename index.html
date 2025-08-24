@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Empezar a Jugar</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <main class="card" role="dialog" aria-labelledby="heroTitle age-title" aria-describedby="age-desc">
+    <!-- TITULO PRINCIPAL DINÁMICO (muestra nombre sacado de la última parte de la URL) -->
+    <h2 id="heroTitle" class="hero-title" aria-live="polite">¡Te saluda Wonbet<span id="username">Jugador</span>!</h2>
+
+    <!-- Subtitulo / Título de la card -->
+
+    <p id="age-desc" class="lead">Sos mayor de <strong>18+</strong> años?</p>
+
+    <!-- BLOQUE: JUGAR -->
+    <div class="cta-wrap" aria-label="Acción jugar">
+      <a href="#" class="btn" id="playBtn" role="button" aria-pressed="false">JUGAR</a>
+    </div>
+
+    <div class="desc" aria-hidden="false">
+      <p><strong>Haz click aqui para Jugar</strong></p>
+    </div>
+
+    <div class="notice" aria-hidden="false">
+      <div class="box">
+        <p class="title">🎰 JUGAR</p>
+        <div class="leftbar">
+          <p class="content">
+            Si ya tenes Usuario podés hacer click en este botón para <strong>empezar a Jugar.</strong><br>
+            <span style="display:inline-block; margin-top:6px; font-size:12px; opacity:0.85;">
+              No compartas tus datos con nadie.
+            </span>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- separador -->
+    <hr class="sep">
+
+    <!-- BLOQUE ADICIONAL: CAJA -->
+    <div class="cta-wrap" aria-label="Acción caja" style="margin-top:6px;">
+      <a href="#" class="btn" id="cajaBtn" role="button" aria-pressed="false">CAJA</a>
+    </div>
+
+    <div class="desc" aria-hidden="false" style="margin-top:10px;">
+      <p style="font-weight:700;">
+        Hace click acá para <strong>cargas y retiros</strong>
+      </p>
+    </div>
+
+    <div class="notice" aria-hidden="false" style="margin-top:10px;">
+      <div class="box">
+        <p class="title">🏧 CAJA</p>
+        <div class="leftbar">
+          <p class="content">
+            Para comunicarte con un cajero y hacer una <strong>recarga/retiro</strong> o cualquier otro tipo de duda sobre tu usuario, esta es la opción a elegir.
+          </p>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+<script>
+
+  let name;
+  /* ---------- Extrae el último segmento de la URL y lo formatea ---------- */
+  
+  (function () {
+    // toma pathname (por ejemplo "/ruta/al/usuario"), ignora barras vacías
+    const lastRaw = window.location.pathname.split('/').filter(Boolean).pop() || '';
+    // si no hay nada, usamos 'Jugador'
+    const raw = lastRaw || 'Jugador';
+    // decodifica y limpia: reemplaza guiones/underscores/plus por espacios
+    const decoded = decodeURIComponent(raw.replace(/\+/g, ' ')).replace(/[-_]+/g, ' ').trim();
+    // capitaliza cada palabra
+    name = decoded.split(/\s+/).map(s => s.charAt(0).toUpperCase() + s.slice(1).toLowerCase()).join(' ');
+    // setea en el span
+    const el = document.getElementById('username');
+    if (el) el.textContent = name || 'Jugador';
+  })();
+
+
+  async function  postBack(url, payload) {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+    return await res.json();   
+  }
+
+  /* ---------- Handlers de botones y accesibilidad ---------- */
+  document.getElementById('playBtn').addEventListener('click', function (e) {
+    
+    window.open("https://wonbet.lat/", "_blank", "noopener,noreferrer");
+    
+    // ejemplo: redirigir o ejecutar función real
+    // e.preventDefault(); // descomentá si usás solo demo
+    console.log('JUGAR -> clicked');
+    // window.location.href = '/jugar'; // ejemplo real
+  });
+
+  document.getElementById('cajaBtn').addEventListener('click', function (e) {
+    console.log('CAJA -> clicked');
+      const Usuario = name;
+      console.log(`Usuario: ${Usuario}`);
+
+      const URL = "https://xneli80uz8.execute-api.us-east-2.amazonaws.com/default/orion-l"
+
+      if (!Usuario || Usuario.trim()===""){
+        window.alert("⚠️Error: No se encontro tu usuario\n 🛑Por favor ingresar desde el link que se te envio antes");
+      } else {
+        const payload = { Usuario : Usuario}
+        postBack(URL, payload)
+        console.log("Datos enviados al servidor");
+      }
+
+      
+    // window.location.href = '/caja'; // ejemplo real
+  });
+
+  // teclas rápidas: Enter dispara JUGAR
+  window.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') {
+      document.getElementById('playBtn').click();
+    } else if (e.key === 'Escape') {
+      // opcional: podrías cerrar el modal si lo querés implementar
+    }
+  });
+</script>
+
+</body>
+</html>
