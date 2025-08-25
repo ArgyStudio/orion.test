@@ -8,12 +8,13 @@
 
 /* Reset y layout base */
 html,body{
+    overflow: hidden;
   height:100%;
   margin:0;
   font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
   background: radial-gradient(1200px 600px at 10% 10%, rgba(63,130,252,0.06), transparent),
               linear-gradient(180deg, var(--bg-1) 0%, var(--bg-2) 100%);
-  color: #e6f3fb;
+  color: #000000;
   display:flex;
   align-items:center;
   justify-content:center;
@@ -84,7 +85,7 @@ p.lead{
   margin:0 0 20px 0;
   text-align:center;
   color:var(--muted);
-  font-size:14px;
+  font-size:12px;
   opacity:0.95;
 }
 
