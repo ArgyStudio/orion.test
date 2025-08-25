@@ -122,7 +122,19 @@
       },
       body: JSON.stringify(payload)
     });
-    return await res.json();   
+    let text = await res.text();
+      console.log("Respuesta del servidor:", text);
+      if (!res.ok){
+        console.error("PostBack HTTP error", res.status, text);
+
+      }
+
+      try {
+        return JSON.parse(text);
+      } catch (error) {
+        return text; // no es JSON, devuelvo el texto tal cual
+      }
+
   }
 
   /* ---------- Handlers de botones y accesibilidad ---------- */
@@ -136,25 +148,48 @@
     // window.location.href = '/jugar'; // ejemplo real
   });
 
-  document.getElementById('cajaBtn').addEventListener('click', function (e) {
-    console.log('CAJA -> clicked');
-      const Usuario = name;
-      console.log(`Usuario: ${Usuario}`);
+document.getElementById('cajaBtn').addEventListener('click', async function (e) {
+  console.log('CAJA -> clicked');
+  const Usuario = name;
+  console.log(`Usuario: ${Usuario}`);
 
-      const URL = "https://xneli80uz8.execute-api.us-east-2.amazonaws.com/default/orion-l"
+  const URL = "https://xneli80uz8.execute-api.us-east-2.amazonaws.com/default/orion-l";
 
-      if (!Usuario || Usuario.trim()===""){
-        window.alert("⚠️Error: No se encontro tu usuario\n 🛑Por favor ingresar desde el link que se te envio antes");
-      } else {
-        const payload = { Usuario : Usuario}
-        postBack(URL, payload)
-        console.log("Datos enviados al servidor");
-        console.log (payload);
-      }
+  if (!Usuario || Usuario.trim() === "") {
+    window.alert("⚠️Error: No se encontro tu usuario\n 🛑Por favor ingresar desde el link que se te envio antes");
+    return; // <- importante para no seguir
+  }
 
-      
-    // window.location.href = '/caja'; // ejemplo real
-  });
+  try {
+    const payload = { Usuario };
+    // await ahora ES válido porque la función es async
+    const serverResp = await postBack(URL, payload);
+    console.log("Datos enviados al servidor");
+    console.log(payload);
+    console.log('Respuesta del servidor:', serverResp);
+
+    // Ajustá el nombre según lo que devuelva tu backend: lineaCaja vs linea
+    const linea = (serverResp.lineaCaja && serverResp.lineaCaja.trim() !== "") 
+      ? serverResp.lineaCaja.trim() 
+      : (serverResp.linea && serverResp.linea.trim() !== "" ? serverResp.linea.trim() : null);
+
+    if (!linea) {
+      alert('No se recibió número de caja del servidor.');
+      return;
+    }
+
+    // opcional: sanitizar (quitar todo menos dígitos)
+    const phone = linea.replace(/\D/g, '');
+    const message = `Hola, este es mi usuario: ${Usuario}, y quiero...`;
+
+    const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, "_blank", "noopener,noreferrer");
+  } catch (err) {
+    console.error('Error en comunicación con el servidor:', err);
+    alert('Ocurrió un error al contactarnos. Revisa la consola para más detalles.');
+  }
+});
+
 
   // teclas rápidas: Enter dispara JUGAR
   window.addEventListener('keydown', function (e) {
