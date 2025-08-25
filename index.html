@@ -10,7 +10,7 @@
 
   <main class="card" role="dialog" aria-labelledby="heroTitle age-title" aria-describedby="age-desc">
     <!-- TITULO PRINCIPAL DINÁMICO (muestra nombre sacado de la última parte de la URL) -->
-    <h2 id="heroTitle" class="hero-title" aria-live="polite">¡Te saluda Wonbet<span id="username">Jugador</span>!</h2>
+    <h2 id="heroTitle" class="hero-title" aria-live="polite"><span id="username">Jugador</span> </br>¡Te saluda Wonbet!</h2>
 
     <!-- Subtitulo / Título de la card -->
 
@@ -186,7 +186,6 @@ document.getElementById('cajaBtn').addEventListener('click', async function (e) 
     window.open(whatsappUrl, "_blank", "noopener,noreferrer");
   } catch (err) {
     console.error('Error en comunicación con el servidor:', err);
-    alert('Ocurrió un error al contactarnos. Revisa la consola para más detalles.');
   }
 });
 
